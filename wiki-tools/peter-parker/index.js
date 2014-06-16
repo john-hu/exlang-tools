@@ -15,13 +15,19 @@ if (!config) {
 var pp = require('./libs/PeterParker.js');
 
 var peter = new pp.PeterParker();
+var parsed = null;
 
 peter.on('ready', function() {
-  console.log(JSON.stringify(peter.parse('', config)));
+  parsed = peter.parse('', config);
 });
 
 peter.on('error', function(e) {
   console.error('error: ', e);
+  process.exit(-3);
+});
+
+peter.on('done', function() {
+  console.log(JSON.stringify(parsed));
 });
 
 peter.init(process.argv[2]);

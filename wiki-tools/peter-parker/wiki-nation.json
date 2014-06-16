@@ -51,18 +51,45 @@
     "type": "attr",
     "attr": "src"
   },
-  "languageList": {
+  "otherLanguages": {
     "selector": "div#p-lang ul li.interlanguage-link",
-    "type": "json-parser",
+    "type": "peter-parker",
+    "url": {
+      "selector": "a[lang]",
+      "type": "link"
+    },
+    "lang": {
+      "selector": "a[lang]",
+      "type": "attr",
+      "attr": "lang"
+    },
     "config": {
-      "url": {
-        "selector": "a[lang]",
-        "type": "link"
+      "wikiUrl": {
+        "type": "parent-field",
+        "field": "url"
+      },
+      "countryName": {
+        "selector": "table.infobox span.country-name",
+        "type": "attr",
+        "attr": "textContent"
+      },
+      "name": {
+        "selector": "div[role='main'] .firstHeading > span",
+        "type": "attr",
+        "attr": "textContent"
       },
       "lang": {
-        "selector": "a[lang]",
-        "type": "attr",
-        "attr": "lang"
+        "type": "parent-field",
+        "field": "lang"
+      },
+      "shortDesc": {
+        "selector": {
+          "base": "div[role='main'] .mw-body-content .toc",
+          "filter": "prevAll",
+          "subSelector": "p"
+        },
+        "type": "attrs",
+        "attr": "textContent"
       }
     }
   }
