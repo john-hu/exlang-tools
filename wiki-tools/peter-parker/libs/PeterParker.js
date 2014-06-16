@@ -6,6 +6,7 @@
   function PeterParker() {
   }
 
+  PeterParker.JQUERY_URL = "http://code.jquery.com/jquery.js";
   var proto = PeterParker.prototype;
   proto.__proto__ = evts.EventEmitter.prototype;
 
@@ -22,7 +23,7 @@
     var self = this;
     jsdom.env({
       url: url,
-      scripts: ["http://code.jquery.com/jquery.js"], // load jquery to help us.
+      scripts: [PeterParker.JQUERY_URL], // load jquery to help us.
       done: function jsdom_init_done(errors, window) {
         if (errors instanceof Error) {
           self.emit('error', errors);
@@ -77,7 +78,14 @@
   };
 
   proto._query = function pp__query(context, selectors) {
-    return this._$(selectors, context);
+    if ((typeof selectors) === 'string') {
+      return this._$(selectors, context);
+    } else if (selectors.base && selectors.filter) {
+      // make the query
+      var result = this._$(selectors.base, context);
+      // apply the function call to result
+      return result[selectors.filter](selectors.subSelector);
+    }
   };
 
   proto._parseSingle = function pp__parseSingle(context, config) {
@@ -104,6 +112,8 @@
 
   proto.execute = function pp_execute(context, cmd) {
     switch(cmd.type) {
+      case 'argv':
+        return process.argv[cmd.index];
       case 'link':
         this._debug('query link: ' + context + ' ' + cmd.selector);
         return this.queryLink(context, cmd.selector, cmd.position || 0);
@@ -111,6 +121,13 @@
         this._debug('query attr: ' + context + ' ' + cmd.selector +
                     ', attr: ' + cmd.attr);
         return this.queryAttr(context, cmd.selector, cmd.attr, cmd.position || 0);
+      case 'links':
+        this._debug('query links: ' + context + ' ' + cmd.selector);
+        return this.queryLinks(context, cmd.selector, cmd.position || 0);
+      case 'attrs':
+        this._debug('query attrs: ' + context + ' ' + cmd.selector +
+                    ', attr: ' + cmd.attr);
+        return this.queryAttrs(context, cmd.selector, cmd.attr, cmd.position || 0);
       case 'json-parser':
         this._debug('nested parser: ' + context + ' ' + cmd.selector);
         return this.parse(this._query(context, cmd.selector), cmd.config);
